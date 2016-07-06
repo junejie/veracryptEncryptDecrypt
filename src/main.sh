@@ -34,6 +34,10 @@ while getopts "h?vd:" opt; do
     v)  verbose=1
         ;;
     d)  encrypt_dir=$OPTARG
+        ls -R $encrypt_dir | awk '
+        /:$/&&f{s=$0;f=0}
+        /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
+        NF&&f{ print s"/"$0 }' > out.txt
         ;;
     esac
 done
