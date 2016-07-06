@@ -25,7 +25,8 @@ where:
     -e  encrypt
     -d  decrypt
     -p  path to encrypt or decrypt
-    -o  path to output"
+    -o  path to output
+    -a  password of encrypted file"
 
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
@@ -35,7 +36,7 @@ encrypt_dir=""
 verbose=0
 enc_action=""
 
-while getopts "h?vedp:o:" opts; do
+while getopts "h?vedp:a:o:" opts; do
     case "$opts" in
     h|\?)
         echo "$usage"
@@ -57,6 +58,9 @@ while getopts "h?vedp:o:" opts; do
         ;;
     o)  
         output=$OPTARG
+        ;;
+    a)  
+        password=$OPTARG
         ;;
     esac
 done
@@ -105,11 +109,11 @@ cat file.txt | while read line; do
     echo "------------------------$P %----------------------------"
     echo "create volume to $output/$line"
     echo "filesize: " $VOLUMESIZE
-    sudo veracrypt -t  -c $output/$line --size=$VOLUMESIZE --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
+    sudo veracrypt -t -c $output/$line --size=$VOLUMESIZE --password=$password --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
 
     ##mount
     echo 'mounting ...'
-    sudo veracrypt  -t  --mount $output/$line --password="abc123"  --non-interactive /media/veracrypt2
+    sudo veracrypt -t --mount $output/$line --password=$password  --non-interactive /media/veracrypt2
     sudo cp $line /media/veracrypt2/ -v
     sudo ls -lh /media/veracrypt2/
     sudo du -h /media/veracrypt2/
