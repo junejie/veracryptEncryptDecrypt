@@ -87,13 +87,14 @@ NF&&f{ print s"/"$0 }' > out.txt
 echo "file saved to out.txt"
 
 ### read list of dir and file
+mkdir -p "$output/$encrypt_dir"
 cat out.txt | while read line
     do
         if [ -f "$line" ]; then 
             #echo "file: $line"
             echo $line >> file.txt
         else
-            mkdir -p $output/$line
+            mkdir -p "$output/$line"
             #echo "dir: $line"
         fi
     done
@@ -117,7 +118,7 @@ cat file.txt | while read line; do
     echo 'mounting ...'
     sudo veracrypt -t -f --mount "$output/$line" --password=$password \
     --non-interactive /media/veracrypt4 -v || exit 1
-    sudo cp $line /media/veracrypt4/ -v || exit 1
+    sudo cp "$line" /media/veracrypt4/ -v || exit 1
     sudo ls -lh /media/veracrypt4/ || exit 1
     sudo du -h /media/veracrypt4/ || exit 1
 
