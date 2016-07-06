@@ -62,13 +62,17 @@ while getopts "h?vedp:o:" opts; do
 done
 
 ### start process ###
-rm -rf $output
-mkdir $output
+sudo rm -rf $output
+sudo mkdir $output
+sudo rm file.txt
+sudo rm out.txt
+
 echo "saving to $output folder..."
 ls -R $encrypt_dir | awk '
 /:$/&&f{s=$0;f=0}
 /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
 NF&&f{ print s"/"$0 }' > out.txt
+echo "file saved to out.txt"
 
 ### read list of dir and file
 cat out.txt | while read line
@@ -83,8 +87,9 @@ cat out.txt | while read line
     done
 
 #### read list of file only
-echo '----'
+echo 'total files: ' `cat file.txt | wc -l`
 cat file.txt | while read line; do
+    echo '----'
     echo "create volume to $output/$line"
     #cp $line $output/$line -f
     veracrypt -t  -c $output/$line --size=2M --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
@@ -92,12 +97,14 @@ cat file.txt | while read line; do
     ##mount
     echo 'mounting ...'
     sudo veracrypt  -t  --mount $output/$line --password="abc123"  --non-interactive /media/veracrypt2
-    ls /media
-    sudo cp $line /media/veracrypt2 -v
+    sudo cp $line /media/veracrypt2/ -v
+    sudo ls -lh /media/veracrypt2/
+    sudo du -h /media/veracrypt2/
 
     ##unmount
     echo 'unmounting....'
     sudo veracrypt  -t -d
+    sudo rm -rf /media/veracrypt2
 
 done
 
@@ -109,5 +116,4 @@ rm out.txt
 shift $((OPTIND-1))
 
 [ "$1" = "--" ] && shift
-
 echo "verbose=$verbose,enc_action=$enc_action, encrypt_dir='$encrypt_dir', Leftovers: $@"
