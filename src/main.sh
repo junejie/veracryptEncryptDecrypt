@@ -82,8 +82,6 @@ cat out.txt | while read line
 echo '----'
 pwd
 cat file.txt | while read line; do
-    echo $line
-    ls -lh $line
     cp $line output/$line -vf
     echo '***'
 done
@@ -91,7 +89,6 @@ done
 
 rm file.txt
 rm out.txt
-rm -rf output
 ### end proc ###
 
 
