@@ -22,10 +22,10 @@
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-output_file=""
+encrypt_dir=""
 verbose=0
 
-while getopts "h?vf:" opt; do
+while getopts "h?vd:" opt; do
     case "$opt" in
     h|\?)
         show_help
@@ -33,7 +33,7 @@ while getopts "h?vf:" opt; do
         ;;
     v)  verbose=1
         ;;
-    f)  output_file=$OPTARG
+    d)  encrypt_dir=$OPTARG
         ;;
     esac
 done
@@ -42,4 +42,4 @@ shift $((OPTIND-1))
 
 [ "$1" = "--" ] && shift
 
-echo "verbose=$verbose, output_file='$output_file', Leftovers: $@"
+echo "verbose=$verbose, encrypt_dir='$encrypt_dir', Leftovers: $@"
