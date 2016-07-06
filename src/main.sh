@@ -87,10 +87,12 @@ cat out.txt | while read line
     done
 
 #### read list of file only
+COUNTER=0
 echo 'total files: ' `cat file.txt | wc -l`
 cat file.txt | while read line; do
+    COUNTER=$((COUNTER+1))
     echo '----'
-    echo "create volume to $output/$line"
+    echo "create volume to $output/$line " $COUNTER
     #cp $line $output/$line -f
     veracrypt -t  -c $output/$line --size=2M --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
 
