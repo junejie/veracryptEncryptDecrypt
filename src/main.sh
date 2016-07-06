@@ -18,6 +18,14 @@
 #             2. encrypted file or dir
 #######################################
 
+## show help
+usage="$(basename "$0") [-h] [-s n] -- program to calculate the answer to life, the universe and everything
+where:
+    -h  show this help text
+    -e  encrypt
+    -d  decrypt
+    -p  path to encrypt or decrypt"
+
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
@@ -29,7 +37,7 @@ enc_action=""
 while getopts "h?vedp:" opts; do
     case "$opts" in
     h|\?)
-        show_help
+        echo "$usage"
         exit 0
         ;;
     v)  verbose=1
@@ -57,7 +65,7 @@ NF&&f{ print s"/"$0 }' > out.txt
 echo 1
 cat out.txt | while read line
     do
-      echo "---"
+      echo "---$line"
     done
 
 ### end proc ###
