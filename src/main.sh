@@ -105,7 +105,7 @@ echo 'total files: ' $TOTALFILES
 cat file.txt | while read line; do
     COUNTER=$((COUNTER+1))
     P=`echo "$COUNTER*100/$TOTALFILES"|bc`
-    VOLUMESIZE=$((`ls -s --block-size=1048576 $line | cut -d' ' -f1`  +1))"M"
+    VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +1))"M"
     echo "------------------------$P %----------------------------"
     echo "create volume to $output/$line"
     echo "filesize: " $VOLUMESIZE
