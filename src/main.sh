@@ -80,7 +80,7 @@ sudo rm file.txt
 sudo rm out.txt
 
 echo "saving to $output folder..."
-ls -R $encrypt_dir | awk '
+ls -R "$encrypt_dir" | awk '
 /:$/&&f{s=$0;f=0}
 /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
 NF&&f{ print s"/"$0 }' > out.txt
