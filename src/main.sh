@@ -86,8 +86,8 @@ cat out.txt | while read line
 echo '----'
 cat file.txt | while read line; do
     cp $line $output/$line -f
+    veracrypt -t  -c $output/$line --size=2M --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
 done
-
 
 rm file.txt
 rm out.txt
