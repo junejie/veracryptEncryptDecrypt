@@ -65,17 +65,33 @@ ls -R $encrypt_dir | awk '
 /:$/&&f{s=$0;f=0}
 /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
 NF&&f{ print s"/"$0 }' > out.txt
+
+### read list of dir and file
 cat out.txt | while read line
     do
         if [ -f "$line" ]; then 
-            echo "file: $line"
+            #echo "file: $line"
+            echo $line >> file.txt
         else
             mkdir -p output/$line
-            echo "dir: $line"
+            #echo "dir: $line"
         fi
-
     done
 
+#### read list of file only
+echo '----'
+pwd
+cat file.txt | while read line; do
+    echo $line
+    ls -lh $line
+    cp $line output/$line -vf
+    echo '***'
+done
+
+
+rm file.txt
+rm out.txt
+rm -rf output
 ### end proc ###
 
 
