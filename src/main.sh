@@ -47,11 +47,11 @@ while getopts "h?vedp:a:o:" opts; do
 
     # enc_action [e,d] encrypt,decrypt 
     e)  
-        enc_action=e
+        enc_action="e"
         echo 'start encryption....'
         ;;
     d)  
-        enc_action=d
+        enc_action="d"
         ;;
     p)  
         encrypt_dir=$OPTARG
@@ -79,7 +79,9 @@ sudo mkdir $output
 sudo rm -rf file.txt
 sudo rm -rf out.txt
 
+echo "action: $enc_action"
 echo "saving to $output folder..."
+
 ls -R "$encrypt_dir" | awk '
 /:$/&&f{s=$0;f=0}
 /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
@@ -90,12 +92,10 @@ echo "file saved to out.txt"
 mkdir -p "$output/$encrypt_dir"
 cat out.txt | while read line
     do
-        if [ -f "$line" ]; then 
-            #echo "file: $line"
+        if [ -f "$line" ]; then
             echo $line >> file.txt
         else
             mkdir -p "$output/$line"
-            #echo "dir: $line"
         fi
     done
 
@@ -103,30 +103,36 @@ cat out.txt | while read line
 COUNTER=0
 TOTALFILES=`cat file.txt | wc -l`
 echo 'total files: ' $TOTALFILES
-cat file.txt | while read line; do
-    COUNTER=$((COUNTER+1))
-    P=`echo "$COUNTER*100/$TOTALFILES"|bc`
-    VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +1))"M"
-    echo "------------------------$P %----------------------------"
-    echo "create volume to $output/$line"
-    echo "filesize: " $VOLUMESIZE
-    sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
-    --password=$password --hash="sha-512" --encryption="AES" \
-    --filesystem="NTFS" --non-interactive -v || exit 1
 
-    ##mount
-    echo 'mounting ...'
-    sudo veracrypt -t -f --mount "$output/$line" --password=$password \
-    --non-interactive /media/veracrypt4 -v || exit 1
-    sudo cp "$line" /media/veracrypt4/ -v || exit 1
-    sudo ls -lh /media/veracrypt4/ || exit 1
-    sudo du -h /media/veracrypt4/ || exit 1
+if [ "$enc_action" = "e" ]; then
+    cat file.txt | while read line; do
+        COUNTER=$((COUNTER+1))
+        P=`echo "$COUNTER*100/$TOTALFILES"|bc`
+        VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +1))"M"
+        echo "------------------------$P %----------------------------"
+        echo "create volume to $output/$line"
+        echo "filesize: " $VOLUMESIZE
+        sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
+        --password=$password --hash="sha-512" --encryption="AES" \
+        --filesystem="NTFS" --non-interactive -v || exit 1
 
-    ##unmount
-    echo 'unmounting....'
-    sudo veracrypt -t -f -d "$output/$line" -v || exit 1
-    sudo rm -rf /media/veracrypt4
-done
+        ##mount
+        echo 'mounting ...'
+        sudo veracrypt -t -f --mount "$output/$line" --password=$password \
+        --non-interactive /media/veracrypt4 -v || exit 1
+        sudo cp "$line" /media/veracrypt4/ -v || exit 1
+        sudo ls -lh /media/veracrypt4/ || exit 1
+        sudo du -h /media/veracrypt4/ || exit 1
+
+        ##unmount
+        echo 'unmounting....'
+        sudo veracrypt -t -f -d "$output/$line" -v || exit 1
+        sudo rm -rf /media/veracrypt4
+    done
+else
+    echo 'd'
+    cat file.txt
+fi
 
 sudo rm file.txt
 sudo rm out.txt
