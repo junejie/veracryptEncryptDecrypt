@@ -130,6 +130,7 @@ done
 
 sudo rm file.txt
 sudo rm out.txt
+sudo chmod 777 "$output" -R
 ### end proc ###
 
 
