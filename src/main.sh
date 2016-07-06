@@ -85,7 +85,7 @@ cat out.txt | while read line
 #### read list of file only
 echo '----'
 cat file.txt | while read line; do
-    echo 'create volume to $output/$line'
+    echo "create volume to $output/$line"
     #cp $line $output/$line -f
     veracrypt -t  -c $output/$line --size=2M --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
 
@@ -93,7 +93,7 @@ cat file.txt | while read line; do
     echo 'mounting ...'
     sudo veracrypt  -t  --mount $output/$line --password="abc123"  --non-interactive /media/veracrypt2
     ls /media
-    sudo cp $line "/media/veracrypt2/$output/$line" -v
+    sudo cp $line /media/veracrypt2 -v
 
     ##unmount
     echo 'unmounting....'
