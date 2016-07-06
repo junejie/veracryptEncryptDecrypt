@@ -76,8 +76,8 @@ done
 
 sudo rm -rf $output
 sudo mkdir $output
-sudo rm file.txt
-sudo rm out.txt
+sudo rm -rf file.txt
+sudo rm -rf out.txt
 
 echo "saving to $output folder..."
 ls -R "$encrypt_dir" | awk '
