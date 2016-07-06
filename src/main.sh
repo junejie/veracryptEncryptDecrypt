@@ -101,10 +101,11 @@ echo 'total files: ' $TOTALFILES
 cat file.txt | while read line; do
     COUNTER=$((COUNTER+1))
     P=`echo "$COUNTER*100/$TOTALFILES"|bc`
-    echo '----'
-    echo "create volume to $output/$line $P %"
-    #cp $line $output/$line -f
-    sudo veracrypt -t  -c $output/$line --size=2M --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
+    VOLUMESIZE=$((`ls -s --block-size=1048576 $line | cut -d' ' -f1`  +1))"M"
+    echo "------------------------$P %----------------------------"
+    echo "create volume to $output/$line"
+    echo "filesize: " $VOLUMESIZE
+    sudo veracrypt -t  -c $output/$line --size=$VOLUMESIZE --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
 
     ##mount
     echo 'mounting ...'
