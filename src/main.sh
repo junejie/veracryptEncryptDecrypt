@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#set -e
 #######################################
 # steps
 #     encryption
@@ -62,6 +62,14 @@ while getopts "h?vedp:o:" opts; do
 done
 
 ### start process ###
+
+{
+    sudo veracrypt  -t -d
+    sudo rm -rf /media/veracrypt2
+} || {
+    exit 1
+}
+
 sudo rm -rf $output
 sudo mkdir $output
 sudo rm file.txt
@@ -96,7 +104,7 @@ cat file.txt | while read line; do
     echo '----'
     echo "create volume to $output/$line $P %"
     #cp $line $output/$line -f
-    veracrypt -t  -c $output/$line --size=2M --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
+    sudo veracrypt -t  -c $output/$line --size=2M --password="abc123" --hash="sha-512" --encryption="AES" --filesystem="NTFS" --non-interactive -v
 
     ##mount
     echo 'mounting ...'
@@ -112,8 +120,8 @@ cat file.txt | while read line; do
 
 done
 
-rm file.txt
-rm out.txt
+sudo rm file.txt
+sudo rm out.txt
 ### end proc ###
 
 
