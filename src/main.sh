@@ -24,7 +24,8 @@ where:
     -h  show this help text
     -e  encrypt
     -d  decrypt
-    -p  path to encrypt or decrypt"
+    -p  path to encrypt or decrypt
+    -o  path to output"
 
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
@@ -34,7 +35,7 @@ encrypt_dir=""
 verbose=0
 enc_action=""
 
-while getopts "h?vedp:" opts; do
+while getopts "h?vedp:o:" opts; do
     case "$opts" in
     h|\?)
         echo "$usage"
@@ -47,9 +48,6 @@ while getopts "h?vedp:" opts; do
     e)  
         enc_action=e
         echo 'start encryption....'
-        rm -rf output
-        mkdir output
-        echo 'saving to output folder...'
         ;;
     d)  
         enc_action=d
@@ -57,10 +55,16 @@ while getopts "h?vedp:" opts; do
     p)  
         encrypt_dir=$OPTARG
         ;;
+    o)  
+        output=$OPTARG
+        ;;
     esac
 done
 
 ### start process ###
+rm -rf $output
+mkdir $output
+echo "saving to $output folder..."
 ls -R $encrypt_dir | awk '
 /:$/&&f{s=$0;f=0}
 /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
@@ -73,17 +77,15 @@ cat out.txt | while read line
             #echo "file: $line"
             echo $line >> file.txt
         else
-            mkdir -p output/$line
+            mkdir -p $output/$line
             #echo "dir: $line"
         fi
     done
 
 #### read list of file only
 echo '----'
-pwd
 cat file.txt | while read line; do
-    cp $line output/$line -vf
-    echo '***'
+    cp $line $output/$line -f
 done
 
 
