@@ -70,6 +70,7 @@ cat out.txt | while read line
         if [ -f "$line" ]; then 
             echo "file: $line"
         else
+            mkdir -p output/$line
             echo "dir: $line"
         fi
 
