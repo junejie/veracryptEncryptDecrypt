@@ -74,37 +74,40 @@ done
     exit 1
 }
 
-sudo rm -rf $output
-sudo mkdir $output
-sudo rm -rf file.txt
-sudo rm -rf out.txt
 
 echo "action: $enc_action"
-echo "saving to $output folder..."
-
-ls -R "$encrypt_dir" | awk '
-/:$/&&f{s=$0;f=0}
-/:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
-NF&&f{ print s"/"$0 }' > out.txt
-echo "file saved to out.txt"
-
-### read list of dir and file
-mkdir -p "$output/$encrypt_dir"
-cat out.txt | while read line
-    do
-        if [ -f "$line" ]; then
-            echo $line >> file.txt
-        else
-            mkdir -p "$output/$line"
-        fi
-    done
-
-#### read list of file only
-COUNTER=0
-TOTALFILES=`cat file.txt | wc -l`
-echo 'total files: ' $TOTALFILES
 
 if [ "$enc_action" = "e" ]; then
+    
+    sudo rm -rf $output
+    sudo mkdir $output
+    sudo rm -rf file.txt
+    sudo rm -rf out.txt
+
+    echo "saving to $output folder..."
+
+    ls -R "$encrypt_dir" | awk '
+    /:$/&&f{s=$0;f=0}
+    /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
+    NF&&f{ print s"/"$0 }' > out.txt
+    echo "file saved to out.txt"
+
+    ### read list of dir and file
+    mkdir -p "$output/$encrypt_dir"
+    cat out.txt | while read line
+        do
+            if [ -f "$line" ]; then
+                echo $line >> file.txt
+            else
+                mkdir -p "$output/$line"
+            fi
+        done
+
+    #### read list of file only
+    COUNTER=0
+    TOTALFILES=`cat file.txt | wc -l`
+    echo 'total files: ' $TOTALFILES
+    
     cat file.txt | while read line; do
         COUNTER=$((COUNTER+1))
         P=`echo "$COUNTER*100/$TOTALFILES"|bc`
@@ -129,14 +132,22 @@ if [ "$enc_action" = "e" ]; then
         sudo veracrypt -t -f -d "$output/$line" -v || exit 1
         sudo rm -rf /media/veracrypt4
     done
+
+    sudo rm file.txt
+    sudo rm out.txt
+    sudo chmod 777 "$output" -R
 else
     echo 'd'
-    cat file.txt
+    echo "storing to $encrypt_dir folder..."
+
+    ls -R "$encrypt_dir" | awk '
+    /:$/&&f{s=$0;f=0}
+    /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
+    NF&&f{ print s"/"$0 }' > restoreList.txt
+    echo "file saved to restoreList.txt"
+    cat restoreList.txt
 fi
 
-sudo rm file.txt
-sudo rm out.txt
-sudo chmod 777 "$output" -R
 ### end proc ###
 
 
