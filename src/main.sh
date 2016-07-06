@@ -46,6 +46,10 @@ while getopts "h?vedp:" opts; do
     # enc_action [e,d] encrypt,decrypt 
     e)  
         enc_action=e
+        echo 'start encryption....'
+        rm -rf output
+        mkdir output
+        echo 'saving to output folder...'
         ;;
     d)  
         enc_action=d
@@ -57,12 +61,10 @@ while getopts "h?vedp:" opts; do
 done
 
 ### start process ###
-echo $enc_action
 ls -R $encrypt_dir | awk '
 /:$/&&f{s=$0;f=0}
 /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
 NF&&f{ print s"/"$0 }' > out.txt
-echo 1
 cat out.txt | while read line
     do
         if [ -f "$line" ]; then 
