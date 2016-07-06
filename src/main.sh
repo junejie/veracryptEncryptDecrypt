@@ -65,7 +65,12 @@ NF&&f{ print s"/"$0 }' > out.txt
 echo 1
 cat out.txt | while read line
     do
-      echo "---$line"
+        if [ -f "$line" ]; then 
+            echo "file: $line"
+        else
+            echo "dir: $line"
+        fi
+
     done
 
 ### end proc ###
