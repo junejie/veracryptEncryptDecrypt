@@ -109,13 +109,13 @@ cat file.txt | while read line; do
     echo "------------------------$P %----------------------------"
     echo "create volume to $output/$line"
     echo "filesize: " $VOLUMESIZE
-    sudo veracrypt -t -f -c $output/$line --size=$VOLUMESIZE \
+    sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
     --password=$password --hash="sha-512" --encryption="AES" \
     --filesystem="NTFS" --non-interactive -v || exit 1
 
     ##mount
     echo 'mounting ...'
-    sudo veracrypt -t -f --mount $output/$line --password=$password \
+    sudo veracrypt -t -f --mount "$output/$line" --password=$password \
     --non-interactive /media/veracrypt4 -v || exit 1
     sudo cp $line /media/veracrypt4/ -v || exit 1
     sudo ls -lh /media/veracrypt4/ || exit 1
@@ -123,7 +123,7 @@ cat file.txt | while read line; do
 
     ##unmount
     echo 'unmounting....'
-    sudo veracrypt -t -f -d $output/$line -v || exit 1
+    sudo veracrypt -t -f -d "$output/$line" -v || exit 1
     sudo rm -rf /media/veracrypt4
 done
 
