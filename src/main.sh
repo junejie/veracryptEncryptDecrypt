@@ -180,10 +180,8 @@ else
         sudo veracrypt -t -f -d "$filerestore" -v || exit 1
         sudo rm -rf /media/veracrypt4
         sudo chmod 777 "$output/$filerestore"
-        exit 1
+        #exit 1
     done
-
-
 
 fi
 
