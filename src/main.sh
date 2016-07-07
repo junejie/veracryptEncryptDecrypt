@@ -149,16 +149,21 @@ else
     
     echo "create dir for $output"
     mkdir -p "$output"
-    cat restoreList.txt | while read line
+    rm -rf enc_restore.txt
+    touch enc_restore.txt
+    cat restoreList.txt | while read toberestored
         do
-            if [ -f "$line" ]; then
-                echo $line "-file"
+            if [ -f "$toberestored" ]; then
+                echo $toberestored "-file"
+                echo $toberestored >> enc_restore.txt
             else
-                echo $line "-dir"
-                mkdir -p "$output/$line"
+                echo $toberestored "-dir"
+                mkdir -p "$output/$toberestored"
             fi
         done
 
+    ##delete restorelist
+    sudo rm -rf restoreList.txt
 fi
 
 ### end proc ###
