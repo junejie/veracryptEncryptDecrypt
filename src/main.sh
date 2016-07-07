@@ -164,6 +164,27 @@ else
 
     ##delete restorelist
     sudo rm -rf restoreList.txt
+
+    ## start mouting thes files
+    echo 'start mounting file tobe restore'
+    cat enc_restore.txt | while read filerestore; do
+        echo "mounting : $filerestore"
+        sudo veracrypt -t -f --mount "$filerestore" --password=$password \
+        --non-interactive /media/veracrypt4 -v || exit 1
+
+        ls -lh /media/veracrypt4
+        sudo cp /media/veracrypt4/* "$output/$filerestore" -v
+
+        ##unmount
+        echo 'unmounting....'
+        sudo veracrypt -t -f -d "$filerestore" -v || exit 1
+        sudo rm -rf /media/veracrypt4
+        sudo chmod 777 "$output/$filerestore"
+        exit 1
+    done
+
+
+
 fi
 
 ### end proc ###
