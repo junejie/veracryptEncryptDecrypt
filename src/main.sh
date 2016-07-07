@@ -138,14 +138,27 @@ if [ "$enc_action" = "e" ]; then
     sudo chmod 777 "$output" -R
 else
     echo 'd'
-    echo "storing to $encrypt_dir folder..."
+    echo "restore from: $encrypt_dir folder..."
+    echo "storing to: $output folder..."
 
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > restoreList.txt
     echo "file saved to restoreList.txt"
-    cat restoreList.txt
+    
+    echo "create dir for $output"
+    mkdir -p "$output"
+    cat restoreList.txt | while read line
+        do
+            if [ -f "$line" ]; then
+                echo $line "-file"
+            else
+                echo $line "-dir"
+                #mkdir -p "$output/$line"
+            fi
+        done
+
 fi
 
 ### end proc ###
