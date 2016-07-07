@@ -28,10 +28,8 @@ where:
     -o  path to output
     -a  password of encrypted file"
 
-# A POSIX variable
-OPTIND=1         # Reset in case getopts has been used previously in the shell.
+OPTIND=1
 
-# Initialize our own variables:
 encrypt_dir=""
 verbose=0
 enc_action=""
@@ -75,7 +73,7 @@ done
 }
 
 
-echo "action: $enc_action"
+echo "ACTION: $enc_action"
 
 if [ "$enc_action" = "e" ]; then
     
@@ -84,13 +82,13 @@ if [ "$enc_action" = "e" ]; then
     sudo rm -rf file.txt
     sudo rm -rf out.txt
 
-    echo "saving to $output folder..."
+    echo "SAVED TO: $output"
 
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > out.txt
-    echo "file saved to out.txt"
+    echo "DIR LIST: out.txt"
 
     ### read list of dir and file
     mkdir -p "$output/$encrypt_dir"
@@ -103,24 +101,23 @@ if [ "$enc_action" = "e" ]; then
             fi
         done
 
-    #### read list of file only
     COUNTER=0
     TOTALFILES=`cat file.txt | wc -l`
-    echo 'total files: ' $TOTALFILES
+    echo 'TOTALFILES: ' $TOTALFILES
     
     cat file.txt | while read line; do
         COUNTER=$((COUNTER+1))
         P=`echo "$COUNTER*100/$TOTALFILES"|bc`
         VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +1))"M"
         echo "------------------------$P %----------------------------"
-        echo "create volume to $output/$line"
-        echo "filesize: " $VOLUMESIZE
+        echo "CREATE VOLUME: $output/$line"
+        echo "VOLUME SIZE: " $VOLUMESIZE
         sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
         --password=$password --hash="sha-512" --encryption="AES" \
         --filesystem="NTFS" --non-interactive -v || exit 1
 
         ##mount
-        echo 'mounting ...'
+        echo 'MOUNTING...'
         sudo veracrypt -t -f --mount "$output/$line" --password=$password \
         --non-interactive /media/veracrypt4 -v || exit 1
         sudo cp "$line" /media/veracrypt4/ -v || exit 1
@@ -128,7 +125,7 @@ if [ "$enc_action" = "e" ]; then
         sudo du -h /media/veracrypt4/ || exit 1
 
         ##unmount
-        echo 'unmounting....'
+        echo 'UNMOUNTING...'
         sudo veracrypt -t -f -d "$output/$line" -v || exit 1
         sudo rm -rf /media/veracrypt4
     done
@@ -137,26 +134,21 @@ if [ "$enc_action" = "e" ]; then
     sudo rm out.txt
     sudo chmod 777 "$output" -R
 else
-    echo 'd'
-    echo "restore from: $encrypt_dir folder..."
-    echo "storing to: $output folder..."
+    echo "RESTORE FROM: $encrypt_dir"
+    echo "STORE TO: $output"
 
     sudo rm enc_restore.txt
-
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > restoreList.txt
-    echo "file saved to restoreList.txt"
-    
-    echo "create dir for $output"
+
     mkdir -p "$output"
     rm -rf enc_restore.txt
     touch enc_restore.txt
     cat restoreList.txt | while read toberestored
         do
             if [ -f "$toberestored" ]; then
-                echo $toberestored "-file"
                 echo $toberestored >> enc_restore.txt
             else
                 echo $toberestored "-dir"
@@ -168,9 +160,8 @@ else
     sudo rm -rf restoreList.txt
 
     ## start mouting thes files
-    echo 'start mounting file tobe restore'
     cat enc_restore.txt | while read filerestore; do
-        echo "mounting : $filerestore"
+        echo "MOUNTING: $filerestore"
         sudo veracrypt -t -f --mount "$filerestore" --password=$password \
         --non-interactive /media/veracrypt4 -v || exit 1
 
@@ -178,19 +169,15 @@ else
         sudo cp /media/veracrypt4/* "$output/$filerestore" -v
 
         ##unmount
-        echo 'unmounting....'
+        echo 'UNMOUNTING...'
         sudo veracrypt -t -f -d "$filerestore" -v || exit 1
         sudo rm -rf /media/veracrypt4
         sudo chmod 777 "$output/$filerestore"
-        #exit 1
     done
     sudo rm enc_restore.txt
-
 fi
 
 ### end proc ###
-
-
 shift $((OPTIND-1))
 
 [ "$1" = "--" ] && shift

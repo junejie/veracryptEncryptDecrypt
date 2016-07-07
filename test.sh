@@ -17,3 +17,5 @@ sudo sh src/main.sh -v -p output -d -o simpletestx -a "abc123"
           echo | tr '\n' '\000'; # separator
           echo "End of hashed data."; # End of input marker
         } | sha256sum
+
+sudo rm simpletestx -rf
