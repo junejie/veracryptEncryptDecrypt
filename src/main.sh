@@ -141,6 +141,8 @@ else
     echo "restore from: $encrypt_dir folder..."
     echo "storing to: $output folder..."
 
+    sudo rm enc_restore.txt
+
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
@@ -182,6 +184,7 @@ else
         sudo chmod 777 "$output/$filerestore"
         #exit 1
     done
+    sudo rm enc_restore.txt
 
 fi
 
