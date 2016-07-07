@@ -1,5 +1,12 @@
-execute: 
-    sudo sh src/main.sh -v -p test -e -o output -a "abc123"
+execute
+=======
+    encrypt
+        sudo sh src/main.sh -v -p test -e -o output -a "abc123"
 
-    sh src/main.sh -v -p test -d -o output
 
+    decrypt
+        sudo sh src/main.sh -v -p output -d -o test -a "abc123"
+
+
+how to execute the test validity
+    sh test.sh
