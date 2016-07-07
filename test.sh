@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo sh src/main.sh -v -p test -e -o output -a "abc123"
-sudo sh src/main.sh -v -p output -d -o test -a "abc123"
+sudo sh src/main.sh -v -p output -d -o testx -a "abc123"
 
 { export LC_ALL=C;cd test;
           du -0ab | sort -z; # file lengths, including directories (with length 0)
