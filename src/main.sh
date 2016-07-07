@@ -155,7 +155,7 @@ else
                 echo $line "-file"
             else
                 echo $line "-dir"
-                #mkdir -p "$output/$line"
+                mkdir -p "$output/$line"
             fi
         done
 
