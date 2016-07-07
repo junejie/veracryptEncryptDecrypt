@@ -120,9 +120,7 @@ if [ "$enc_action" = "e" ]; then
         echo 'MOUNTING...'
         sudo veracrypt -t -f --mount "$output/$line" --password=$password \
         --non-interactive /media/veracrypt4 -v || exit 1
-        sudo cp "$line" /media/veracrypt4/ -v || exit 1
-        sudo ls -lh /media/veracrypt4/ || exit 1
-        sudo du -h /media/veracrypt4/ || exit 1
+        sudo cp "$line" /media/veracrypt4/ || exit 1
 
         ##unmount
         echo 'UNMOUNTING...'
@@ -137,7 +135,10 @@ else
     echo "RESTORE FROM: $encrypt_dir"
     echo "STORE TO: $output"
 
-    sudo rm enc_restore.txt
+    if [ -f enc_restore.txt ]; then
+        sudo rm enc_restore.txt
+    fi
+
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
@@ -164,17 +165,17 @@ else
         echo "MOUNTING: $filerestore"
         sudo veracrypt -t -f --mount "$filerestore" --password=$password \
         --non-interactive /media/veracrypt4 -v || exit 1
-
-        ls -lh /media/veracrypt4
         sudo cp /media/veracrypt4/* "$output/$filerestore" -v
-
-        ##unmount
+        
         echo 'UNMOUNTING...'
         sudo veracrypt -t -f -d "$filerestore" -v || exit 1
         sudo rm -rf /media/veracrypt4
         sudo chmod 777 "$output/$filerestore"
     done
-    sudo rm enc_restore.txt
+
+    if [ -f enc_restore.txt ]; then
+        sudo rm enc_restore.txt
+    fi
 fi
 
 ### end proc ###
