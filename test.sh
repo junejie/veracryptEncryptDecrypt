@@ -70,6 +70,59 @@ f_recursivetest() {
     echo "End of hashed data."; # End of input marker
   } | sha256sum`
 
+  rm -rf "recursive-dir"
+
+}
+
+f_dirwithspace() {
+  echo '---- next test -----'
+  ## build test for recursive dir
+  if [ -d "space dir" ]; then
+    rm -rf "space dir"
+  fi
+
+  mkdir "space dir"
+  mkdir -p "space dir/1"
+  mkdir -p "space dir/2/1"
+  mkdir -p "space dir/3/1"
+
+  ## create file for recursive dir
+  touch "space dir/1/a.txt"
+  echo "abc" > "space dir/1/a.txt"
+
+  touch "space dir/2/1/a.txt"
+  echo "abc" > "space dir/2/1/a.txt"
+
+  touch "space dir/3/1/a.txt"
+  echo "abc" > "space dir/3/1/a.txt"
+
+  ## start encrypt
+  sudo sh src/main.sh -v -p "space dir" -e -o output -a "abc123"
+  sudo sh src/main.sh -v -p output -d -o "space dir-x" -a "abc123"
+
+  spacedir1=`{
+    export LC_ALL=C;cd "space dir";
+    du -0ab | sort -z; # file lengths, including directories (with length 0)
+    echo | tr '\n' '\000'; # separator
+    find -type f -exec sha256sum {} + | sort -z; # file hashes
+    echo | tr '\n' '\000'; # separator
+    echo "End of hashed data."; # End of input marker
+  } | sha256sum`
+
+  spacedir2=`{
+    export LC_ALL=C;cd "space dir-x/output/space dir";
+    du -0ab | sort -z; # file lengths, including directories (with length 0)
+    echo | tr '\n' '\000'; # separator
+    find -type f -exec sha256sum {} + | sort -z; # file hashes
+    echo | tr '\n' '\000'; # separator
+    echo "End of hashed data."; # End of input marker
+  } | sha256sum`
+
+  rm -rf "space dir"
+}
+
+runTest(){
+
   if [ "$r1" = "$r2" ]; then
     echo 'ok: recursive'
   else
@@ -82,10 +135,16 @@ f_recursivetest() {
     echo 'fail: simpletest'
   fi
 
-  rm -rf "recursive-dir"
+  if [ "$spacedir1" = "$spacedir2" ]; then
+    echo 'ok: simpletest'
+  else
+    echo 'fail: spacedir'
+  fi
 
 }
 
 f_simpletest
 f_recursivetest
+f_dirwithspace
+runTest
 echo 'done'
