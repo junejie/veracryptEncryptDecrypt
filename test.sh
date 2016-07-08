@@ -3,26 +3,23 @@
 sudo sh src/main.sh -v -p simpletest -e -o output -a "abc123"
 sudo sh src/main.sh -v -p output -d -o simpletestx -a "abc123"
 
-test1={ export LC_ALL=C;cd simpletest;
-          du -0ab | sort -z; # file lengths, including directories (with length 0)
-          echo | tr '\n' '\000'; # separator
-          find -type f -exec sha256sum {} + | sort -z; # file hashes
-          echo | tr '\n' '\000'; # separator
-          echo "End of hashed data."; # End of input marker
-        } | sha256sum 
-test2={ export LC_ALL=C;cd simpletestx/output/simpletest;
-          du -0ab | sort -z; # file lengths, including directories (with length 0)
-          echo | tr '\n' '\000'; # separator
-          find -type f -exec sha256sum {} + | sort -z; # file hashes
-          echo | tr '\n' '\000'; # separator
-          echo "End of hashed data."; # End of input marker
-        } | sha256sum
+test1=`{ 
+export LC_ALL=C;cd simpletest;
+du -0ab | sort -z; # file lengths, including directories (with length 0)
+echo | tr '\n' '\000'; # separator
+find -type f -exec sha256sum {} + | sort -z; # file hashes
+echo | tr '\n' '\000'; # separator
+echo "End of hashed data."; # End of input marker
+} | sha256sum`
 
-if [ "$test1" = "$test2" ]; then
-  echo 'ok: simpletest'
-else
-  echo 'fail: simpletest'
-fi
+test2=`{ 
+export LC_ALL=C;cd simpletestx/output/simpletest;
+du -0ab | sort -z; # file lengths, including directories (with length 0)
+echo | tr '\n' '\000'; # separator
+find -type f -exec sha256sum {} + | sort -z; # file hashes
+echo | tr '\n' '\000'; # separator
+echo "End of hashed data."; # End of input marker
+} | sha256sum`
 sudo rm simpletestx -rf
 
 echo '---- next test -----'
@@ -51,26 +48,38 @@ echo "abc" > "recursive-dir/3/1/a.txt"
 sudo sh src/main.sh -v -p "recursive-dir" -e -o output -a "abc123"
 sudo sh src/main.sh -v -p output -d -o "recursive-dir-x" -a "abc123"
 
-recursive1={ export LC_ALL=C;cd "recursive-dir";
-          du -0ab | sort -z; # file lengths, including directories (with length 0)
-          echo | tr '\n' '\000'; # separator
-          find -type f -exec sha256sum {} + | sort -z; # file hashes
-          echo | tr '\n' '\000'; # separator
-          echo "End of hashed data."; # End of input marker
-        } | sha256sum 
-recursive2={ export LC_ALL=C;cd "recursive-dir-x/output/recursive-dir";
-          du -0ab | sort -z; # file lengths, including directories (with length 0)
-          echo | tr '\n' '\000'; # separator
-          find -type f -exec sha256sum {} + | sort -z; # file hashes
-          echo | tr '\n' '\000'; # separator
-          echo "End of hashed data."; # End of input marker
-        } | sha256sum
+r1=`{
+  export LC_ALL=C;cd "recursive-dir";
+  du -0ab | sort -z; # file lengths, including directories (with length 0)
+  echo | tr '\n' '\000'; # separator
+  find -type f -exec sha256sum {} + | sort -z; # file hashes
+  echo | tr '\n' '\000'; # separator
+  echo "End of hashed data."; # End of input marker
+} | sha256sum`
+
+r2=`{
+  export LC_ALL=C;cd "recursive-dir-x/output/recursive-dir";
+  du -0ab | sort -z; # file lengths, including directories (with length 0)
+  echo | tr '\n' '\000'; # separator
+  find -type f -exec sha256sum {} + | sort -z; # file hashes
+  echo | tr '\n' '\000'; # separator
+  echo "End of hashed data."; # End of input marker
+} | sha256sum`
 
 
-if [ "$recursive1" = "$recursive2" ]; then
+
+if [ "$r1" = "$r2" ]; then
   echo 'ok: recursive'
 else
   echo 'fail: recursive'
 fi
+
+if [ "$test1" = "$test2" ]; then
+  echo 'ok: simpletest'
+else
+  echo 'fail: simpletest'
+fi
+
+
 rm -rf "recursive-dir"
 echo 'done'
