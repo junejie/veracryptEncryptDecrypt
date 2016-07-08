@@ -144,7 +144,10 @@ else
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > restoreList.txt
 
-    mkdir -p "$output"
+    # save directory where the decrypted dir will be store
+    # must have 1 directory inside to be created autmatically.
+    mkdir -p "$output/$encrypt_dir"
+
     rm -rf enc_restore.txt
     touch enc_restore.txt
     cat restoreList.txt | while read toberestored
@@ -152,10 +155,15 @@ else
             if [ -f "$toberestored" ]; then
                 echo $toberestored >> enc_restore.txt
             else
+                # some directory is not consider by ls
+                # need to create it by force
+                # issue if no sub directory on main dir
                 echo $toberestored "-dir"
                 mkdir -p "$output/$toberestored"
             fi
         done
+
+    ls -lh "$output"
 
     ##delete restorelist
     sudo rm -rf restoreList.txt
@@ -165,7 +173,7 @@ else
         echo "MOUNTING: $filerestore"
         sudo veracrypt -t -f --mount "$filerestore" --password=$password \
         --non-interactive /media/veracrypt4 -v || exit 1
-        sudo cp /media/veracrypt4/* "$output/$filerestore" -v
+        sudo cp /media/veracrypt4/* "$output/$filerestore" -vf
         
         echo 'UNMOUNTING...'
         sudo veracrypt -t -f -d "$filerestore" -v || exit 1
