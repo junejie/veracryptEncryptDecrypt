@@ -81,6 +81,13 @@ createOutputDir(){
             currentFolder=$element
         done
         mkdir -p "$output/$currentFolder"
+
+        ## update out.txt
+        # need to update it.
+        # restore from dir value WILL BE REPLACED by output dir
+        # restoreFrom = "/x/y/z" outputDir = "/a/b/c"
+        # result = /a/b/c
+        cat out.txt
     else
         # possible bug when using abs dir
         mkdir -p "$output/$encrypt_dir"
@@ -103,7 +110,8 @@ init1(){
 
 init1
 
-echo "ACTION: $enc_action"
+echo "RESTORE FROM: $encrypt_dir"
+echo "STORE TO: $output"
 
 if [ "$enc_action" = "e" ]; then
     
@@ -111,8 +119,6 @@ if [ "$enc_action" = "e" ]; then
     sudo mkdir $output
     sudo rm -rf file.txt
     sudo rm -rf out.txt
-
-    echo "SAVED TO: $output"
 
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
@@ -128,6 +134,8 @@ if [ "$enc_action" = "e" ]; then
             if [ -f "$line" ]; then
                 echo $line >> file.txt
             else
+
+                #bug on using abs dir
                 mkdir -p "$output/$line"
             fi
         done
@@ -162,8 +170,6 @@ if [ "$enc_action" = "e" ]; then
     sudo rm out.txt
     sudo chmod 777 "$output" -R
 else
-    echo "RESTORE FROM: $encrypt_dir"
-    echo "STORE TO: $output"
 
     if [ -f enc_restore.txt ]; then
         sudo rm enc_restore.txt
@@ -190,7 +196,6 @@ else
                 # some directory is not consider by ls
                 # need to create it by force
                 # issue if no sub directory on main dir
-                echo $toberestored "-dir"
                 mkdir -p "$output/$toberestored"
             fi
         done
