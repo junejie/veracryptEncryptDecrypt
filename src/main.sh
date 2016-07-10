@@ -64,6 +64,29 @@ while getopts "h?vedp:a:o:" opts; do
 done
 
 ### start process ###
+
+# create dir for output
+createOutputDir(){
+    if [[ "$output" = /* ]]; then
+        ## using abs path
+        # 1. get folder name of encrypted dir
+        # 2. create new folder inside output
+        # 3. folder name if encrypted dir
+
+        a="$encrypt_dir"
+        IFS='/ ' read -r -a array <<< "$a"
+        currentFolder=""
+        for element in "${array[@]}"
+        do
+            currentFolder=$element
+        done
+        mkdir -p "$output/$currentFolder"
+    else
+        # possible bug when using abs dir
+        mkdir -p "$output/$encrypt_dir"
+    fi
+}
+
 MOUNTPOINT=/media/`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5`
 init1(){
     {
@@ -98,7 +121,8 @@ if [ "$enc_action" = "e" ]; then
     echo "DIR LIST: out.txt"
 
     ### read list of dir and file
-    mkdir -p "$output/$encrypt_dir"
+    createOutputDir
+
     cat out.txt | while read line
         do
             if [ -f "$line" ]; then
@@ -150,11 +174,11 @@ else
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > restoreList.txt
 
+    cat restoreList.txt
+
     # save directory where the decrypted dir will be store
     # must have 1 directory inside to be created autmatically.
-
-    # possible bug when using abs dir
-    mkdir -p "$output/$encrypt_dir"
+    createOutputDir    
 
     rm -rf enc_restore.txt
     touch enc_restore.txt
