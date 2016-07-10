@@ -146,6 +146,8 @@ else
 
     # save directory where the decrypted dir will be store
     # must have 1 directory inside to be created autmatically.
+
+    # possible bug when using abs dir
     mkdir -p "$output/$encrypt_dir"
 
     rm -rf enc_restore.txt

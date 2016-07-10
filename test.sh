@@ -121,6 +121,54 @@ f_dirwithspace() {
   rm -rf "space dir"
 }
 
+
+f_dirremotedir() {
+  echo '---- next test -----'
+  ## build test for recursive dir
+  if [ -d "/tmp/remote-dir" ]; then
+    rm -rf "/tmp/remote-dir"
+  fi
+
+  mkdir "/tmp/remote-dir"
+  mkdir -p "/tmp/remote-dir/1"
+  mkdir -p "/tmp/remote-dir/2/1"
+  mkdir -p "/tmp/remote-dir/3/1"
+
+  ## create file for recursive dir
+  touch "/tmp/remote-dir/1/a.txt"
+  echo "abc" > "/tmp/remote-dir/1/a.txt"
+
+  touch "/tmp/remote-dir/2/1/a.txt"
+  echo "abc" > "/tmp/remote-dir/2/1/a.txt"
+
+  touch "/tmp/remote-dir/3/1/a.txt"
+  echo "abc" > "/tmp/remote-dir/3/1/a.txt"
+
+  ## start encrypt
+  sudo sh src/main.sh -v -p "/tmp/remote-dir" -e -o "/tmp/output" -a "abc123"
+  sudo sh src/main.sh -v -p "/tmp/output" -d -o "/tmp/remote-dir-x" -a "abc123"
+
+  remotedir1=`{
+    export LC_ALL=C;cd "/tmp/remote-dir";
+    du -0ab | sort -z; # file lengths, including directories (with length 0)
+    echo | tr '\n' '\000'; # separator
+    find -type f -exec sha256sum {} + | sort -z; # file hashes
+    echo | tr '\n' '\000'; # separator
+    echo "End of hashed data."; # End of input marker
+  } | sha256sum`
+
+  remotedir2=`{
+    export LC_ALL=C;cd "/tmp/remote-dir-x/output";
+    du -0ab | sort -z; # file lengths, including directories (with length 0)
+    echo | tr '\n' '\000'; # separator
+    find -type f -exec sha256sum {} + | sort -z; # file hashes
+    echo | tr '\n' '\000'; # separator
+    echo "End of hashed data."; # End of input marker
+  } | sha256sum`
+
+  rm -rf "/tmp/remote-dir"
+}
+
 runTest(){
 
   if [ "$r1" = "$r2" ]; then
@@ -136,9 +184,15 @@ runTest(){
   fi
 
   if [ "$spacedir1" = "$spacedir2" ]; then
-    echo 'ok: simpletest'
+    echo 'ok: spacedir'
   else
     echo 'fail: spacedir'
+  fi
+
+  if [ "$remotedir1" = "$remotedir2" ]; then
+    echo 'ok: remotedir'
+  else
+    echo 'fail: remotedir'
   fi
 
 }
@@ -146,5 +200,6 @@ runTest(){
 f_simpletest
 f_recursivetest
 f_dirwithspace
+f_dirremotedir
 runTest
 echo 'done'
