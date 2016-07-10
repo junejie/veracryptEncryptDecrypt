@@ -64,14 +64,21 @@ while getopts "h?vedp:a:o:" opts; do
 done
 
 ### start process ###
-
-{
-    sudo veracrypt  -t -d
-    sudo rm -rf /media/veracrypt4
-} || {
-    exit 1
+MOUNTPOINT=/media/`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5`
+init1(){
+    {
+        sudo veracrypt  -t -dv
+        sudo mkdir -p "$MOUNTPOINT"
+        sudo chmod 777 "$MOUNTPOINT" -R
+        ls /media
+        echo $MOUNTPOINT
+        sudo ls -lh $MOUNTPOINT
+    } || {
+        echo 1
+    }
 }
 
+init1
 
 echo "ACTION: $enc_action"
 
@@ -119,13 +126,12 @@ if [ "$enc_action" = "e" ]; then
         ##mount
         echo 'MOUNTING...'
         sudo veracrypt -t -f --mount "$output/$line" --password=$password \
-        --non-interactive /media/veracrypt4 -v || exit 1
-        sudo cp "$line" /media/veracrypt4/ || exit 1
+        --non-interactive "$MOUNTPOINT" -v || exit 1
+        sudo cp "$line" "$MOUNTPOINT/" || exit 1
 
         ##unmount
         echo 'UNMOUNTING...'
         sudo veracrypt -t -f -d "$output/$line" -v || exit 1
-        sudo rm -rf /media/veracrypt4
     done
 
     sudo rm file.txt
@@ -174,12 +180,11 @@ else
     cat enc_restore.txt | while read filerestore; do
         echo "MOUNTING: $filerestore"
         sudo veracrypt -t -f --mount "$filerestore" --password=$password \
-        --non-interactive /media/veracrypt4 -v || exit 1
-        sudo cp /media/veracrypt4/* "$output/$filerestore" -vf
+        --non-interactive "$MOUNTPOINT" -v || exit 1
+        sudo cp "$MOUNTPOINT"/* "$output/$filerestore" -v
         
         echo 'UNMOUNTING...'
         sudo veracrypt -t -f -d "$filerestore" -v || exit 1
-        sudo rm -rf /media/veracrypt4
         sudo chmod 777 "$output/$filerestore"
     done
 
