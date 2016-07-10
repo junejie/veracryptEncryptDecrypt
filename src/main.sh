@@ -108,7 +108,7 @@ if [ "$enc_action" = "e" ]; then
     cat file.txt | while read line; do
         COUNTER=$((COUNTER+1))
         P=`echo "$COUNTER*100/$TOTALFILES"|bc`
-        VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +1))"M"
+        VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +2))"M"
         echo "------------------------$P %----------------------------"
         echo "CREATE VOLUME: $output/$line"
         echo "VOLUME SIZE: " $VOLUMESIZE
