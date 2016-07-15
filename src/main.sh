@@ -241,9 +241,6 @@ echo "FROM: $encrypt_dir"
 echo "TO: $output"
 
 if [ "$enc_action" = "e" ]; then
-    
-    #clean start files
-    cleanup
 
     sudo rm -rf $output
     sudo mkdir $output
@@ -262,9 +259,6 @@ if [ "$enc_action" = "e" ]; then
     startEncrypt
 
 else
-
-    #clean start files
-    cleanup
 
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
