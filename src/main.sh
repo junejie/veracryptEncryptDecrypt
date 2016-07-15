@@ -64,6 +64,14 @@ while getopts "h?vedp:a:o:" opts; do
 done
 
 ### start process ###
+getCurrentFolder(){
+    IFS='/ ' read -r -a array <<< "$1"
+    currentFolder=""
+    for element in "${array[@]}"
+    do
+        currentFolder=$element
+    done
+}
 
 # create dir for output
 createOutputDir(){
@@ -73,13 +81,6 @@ createOutputDir(){
         # 2. create new folder inside output
         # 3. folder name if encrypted dir
 
-        a="$encrypt_dir"
-        IFS='/ ' read -r -a array <<< "$a"
-        currentFolder=""
-        for element in "${array[@]}"
-        do
-            currentFolder=$element
-        done
         mkdir -p "$output/$currentFolder"
 
         ## update out.txt
@@ -129,14 +130,6 @@ startEncrypt(){
     COUNTER=0
     TOTALFILES=`cat file.txt | wc -l`
     echo 'TOTALFILES: ' $TOTALFILES
-
-    a="$encrypt_dir"
-    IFS='/ ' read -r -a array <<< "$a"
-    currentFolder=""
-    for element in "${array[@]}"
-    do
-        currentFolder=$element
-    done
 
     if [[ "$output" = /* ]]; then
 
@@ -194,6 +187,8 @@ startEncrypt(){
     sudo chmod 777 "$output" -R
 }
 
+# initialized
+getCurrentFolder "$encrypt_dir"
 MOUNTPOINT=/media/`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5`
 init1(){
     {
@@ -245,6 +240,14 @@ if [ "$enc_action" = "e" ]; then
     sudo rm -rf $output
     sudo mkdir $output
 
+    if [ -f file.txt ]; then
+        sudo rm file.txt
+    fi
+
+    if [ -f "file-dir.txt" ]; then
+        sudo rm "file-dir.txt"
+    fi
+    
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
@@ -265,15 +268,13 @@ else
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > restoreList.txt
 
+    if [ -f enc_restore.txt ]; then
+        sudo rm enc_restore.txt
+    fi
+
     touch enc_restore.txt
     if [[ "$output" = /* ]]; then
-        a="$encrypt_dir"
-        IFS='/ ' read -r -a array <<< "$a"
-        currentFolder=""
-        for element in "${array[@]}"
-        do
-            currentFolder=$element
-        done
+        
         mkdir -p "$output/$currentFolder"
         outdir="$output/$currentFolder"
 
