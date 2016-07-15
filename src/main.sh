@@ -114,7 +114,6 @@ createOutputDir(){
         cat out.txt | while read line
         do
             if [ -f "$line" ]; then
-                echo "-line"
                 echo "$line" >> file.txt
             else
 
@@ -227,6 +226,13 @@ cleanup(){
         sudo rm "out-rm.txt"
     fi
 
+    if [ -f enc_restore.txt ]; then
+        sudo rm enc_restore.txt
+    fi
+
+    if [ -f restoreList.txt ]; then
+        sudo rm restoreList.txt
+    fi
 }
 
 init1
@@ -238,8 +244,9 @@ if [ "$enc_action" = "e" ]; then
     
     sudo rm -rf $output
     sudo mkdir $output
-    sudo rm -rf file.txt
-    sudo rm -rf out.txt
+
+    #clean start files
+    cleanup
 
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
@@ -256,16 +263,14 @@ if [ "$enc_action" = "e" ]; then
 
 else
 
-    if [ -f enc_restore.txt ]; then
-        sudo rm enc_restore.txt
-    fi
+    #clean start files
+    cleanup
 
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > restoreList.txt
 
-    rm -rf enc_restore.txt
     touch enc_restore.txt
     if [[ "$output" = /* ]]; then
         a="$encrypt_dir"
@@ -305,14 +310,7 @@ else
             done
     fi
 
-
-    ls -lh "$output"
-
-    ##delete restorelist
-    sudo rm -rf restoreList.txt
-
     ## start mouting thes files
-    cat enc_restore.txt
     if [[ "$output" = /* ]]; then
         cat enc_restore.txt | while read filerestore; do
             echo "MOUNTING: $filerestore"
