@@ -88,7 +88,6 @@ createOutputDir(){
         # restoreFrom = "/x/y/z" outputDir = "/a/b/c"
         # result = /a/b/c
         sudo cp out.txt "out-rm.txt"
-        echo `pwd`
         cat out.txt | while read line
         do
             if [ -f "$line" ]; then
@@ -107,9 +106,6 @@ createOutputDir(){
             do
                 mkdir -p "$line"
             done
-
-        rm -rf "file-dir.txt"
-
 
     else
         # possible bug when using abs dir
@@ -196,8 +192,6 @@ startEncrypt(){
 
     fi
 
-    sudo rm file.txt
-    sudo rm out.txt
     sudo chmod 777 "$output" -R
 }
 
@@ -216,6 +210,23 @@ init1(){
 
 cleanup(){
     sudo rm -rf $MOUNTPOINT
+
+    if [ -f out.txt ]; then
+        sudo rm out.txt
+    fi
+
+    if [ -f file.txt ]; then
+        sudo rm file.txt
+    fi
+
+    if [ -f "file-dir.txt" ]; then
+        sudo rm "file-dir.txt"
+    fi
+
+    if [ -f "out-rm.txt" ]; then
+        sudo rm "out-rm.txt"
+    fi
+
 }
 
 init1
