@@ -158,7 +158,7 @@ f_dirremotedir() {
   } | sha256sum`
 
   remotedir2=`{
-    export LC_ALL=C;cd "/tmp/remote-dir-x/output";
+    export LC_ALL=C;cd "/tmp/remote-dir-x/output/remote-dir";
     du -0ab | sort -z; # file lengths, including directories (with length 0)
     echo | tr '\n' '\000'; # separator
     find -type f -exec sha256sum {} + | sort -z; # file hashes
