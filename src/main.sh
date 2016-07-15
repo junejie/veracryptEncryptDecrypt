@@ -220,7 +220,7 @@ init1(){
 
 init1
 
-echo "to be encrypt FROM: $encrypt_dir"
+echo "FROM: $encrypt_dir"
 echo "encrypted: $output"
 
 if [ "$enc_action" = "e" ]; then
@@ -259,7 +259,7 @@ else
 
     # save directory where the decrypted dir will be store
     # must have 1 directory inside to be created autmatically.
-    createOutputDir    
+    #createOutputDir    
 
     rm -rf enc_restore.txt
     touch enc_restore.txt
