@@ -87,10 +87,47 @@ createOutputDir(){
         # restore from dir value WILL BE REPLACED by output dir
         # restoreFrom = "/x/y/z" outputDir = "/a/b/c"
         # result = /a/b/c
-        cat out.txt
+        sudo cp out.txt "out-rm.txt"
+        #cat out.txt
+        echo `pwd`
+        #cat out.txt
+        cat out.txt | while read line
+        do
+            if [ -f "$line" ]; then
+                echo "$line" >> file.txt
+            else
+
+                #bug on using abs dir
+                echo "$line" >> "file-dir.txt"
+
+            fi
+        done
+
+        sed -i "s#$encrypt_dir#$output/$currentFolder#g" "file-dir.txt" && echo 'done sed'
+        ## create dir only
+        cat "file-dir.txt" | while read line
+            do
+                mkdir -p "$line"
+            done
+
+        rm -rf "file-dir.txt"
+
+
     else
         # possible bug when using abs dir
         mkdir -p "$output/$encrypt_dir"
+
+        cat out.txt | while read line
+        do
+            if [ -f "$line" ]; then
+                echo "-line"
+                echo "$line" >> file.txt
+            else
+
+                #bug on using abs dir
+                mkdir -p "$output/$line"
+            fi
+        done
     fi
 }
 
@@ -110,8 +147,8 @@ init1(){
 
 init1
 
-echo "RESTORE FROM: $encrypt_dir"
-echo "STORE TO: $output"
+echo "to be encrypt FROM: $encrypt_dir"
+echo "encrypted: $output"
 
 if [ "$enc_action" = "e" ]; then
     
@@ -127,23 +164,17 @@ if [ "$enc_action" = "e" ]; then
     echo "DIR LIST: out.txt"
 
     ### read list of dir and file
+    # out.txt will be replace if using abs path
     createOutputDir
-
-    cat out.txt | while read line
-        do
-            if [ -f "$line" ]; then
-                echo $line >> file.txt
-            else
-
-                #bug on using abs dir
-                mkdir -p "$output/$line"
-            fi
-        done
+    #cat out.txt
+    
 
     COUNTER=0
     TOTALFILES=`cat file.txt | wc -l`
     echo 'TOTALFILES: ' $TOTALFILES
     
+
+    cat "file.txt"
     cat file.txt | while read line; do
         COUNTER=$((COUNTER+1))
         P=`echo "$COUNTER*100/$TOTALFILES"|bc`
@@ -151,19 +182,19 @@ if [ "$enc_action" = "e" ]; then
         echo "------------------------$P %----------------------------"
         echo "CREATE VOLUME: $output/$line"
         echo "VOLUME SIZE: " $VOLUMESIZE
-        sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
-        --password=$password --hash="sha-512" --encryption="AES" \
-        --filesystem="NTFS" --non-interactive -v || exit 1
+        # sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
+        #--password=$password --hash="sha-512" --encryption="AES" \
+        #--filesystem="NTFS" --non-interactive -v || exit 1
 
         ##mount
         echo 'MOUNTING...'
-        sudo veracrypt -t -f --mount "$output/$line" --password=$password \
-        --non-interactive "$MOUNTPOINT" -v || exit 1
+        # sudo veracrypt -t -f --mount "$output/$line" --password=$password \
+        #--non-interactive "$MOUNTPOINT" -v || exit 1
         sudo cp "$line" "$MOUNTPOINT/" || exit 1
 
         ##unmount
         echo 'UNMOUNTING...'
-        sudo veracrypt -t -f -d "$output/$line" -v || exit 1
+        # sudo veracrypt -t -f -d "$output/$line" -v || exit 1
     done
 
     sudo rm file.txt
