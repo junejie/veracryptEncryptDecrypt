@@ -1,6 +1,14 @@
 #!/bin/bash
 
 f_simpletest() {
+
+  mkdir simpletest
+  touch 1.txt
+  echo "1" > "simpletest/1.txt"
+  touch 2.txt
+  echo "2" > "simpletest/2.txt"
+  touch 3.txt
+  echo "3" > "simpletest/3.txt"
   
   sudo /bin/bash src/main.sh -v -p simpletest -e -o output -a "abc123"
   sudo /bin/bash src/main.sh -v -p output -d -o simpletestx -a "abc123"
@@ -22,7 +30,9 @@ f_simpletest() {
   echo | tr '\n' '\000'; # separator
   echo "End of hashed data."; # End of input marker
   } | sha256sum`
-  sudo rm simpletestx -rf
+  rm simpletest -rf
+  rm simpletestx -rf
+  rm output -rf
 
 }
 
