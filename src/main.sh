@@ -304,7 +304,7 @@ else
         cat enc_restore.txt | while read filerestore; do
             echo "MOUNTING: $filerestore"
             ls -lh "$filerestore"
-            copyTo=`echo "$filerestore" | sed "s#$encrypt_dir#$output/remote-dir#g"`
+            copyTo=`echo "$filerestore" | sed "s#$encrypt_dir#$output/$currentFolder#g"`
             sudo veracrypt -t -f --mount "$filerestore" --password=$password \
             --non-interactive "$MOUNTPOINT" -v || exit 1
             sudo cp "$MOUNTPOINT"/* "$copyTo" -v
