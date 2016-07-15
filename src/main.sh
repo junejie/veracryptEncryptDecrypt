@@ -221,7 +221,7 @@ init1(){
 init1
 
 echo "FROM: $encrypt_dir"
-echo "encrypted: $output"
+echo "TO: $output"
 
 if [ "$enc_action" = "e" ]; then
     
@@ -255,25 +255,46 @@ else
     /:$/&&!f{sub(/:$/,"");s=$0;f=1;next}
     NF&&f{ print s"/"$0 }' > restoreList.txt
 
-    cat restoreList.txt
-
-    # save directory where the decrypted dir will be store
-    # must have 1 directory inside to be created autmatically.
-    #createOutputDir    
-
     rm -rf enc_restore.txt
     touch enc_restore.txt
-    cat restoreList.txt | while read toberestored
+    if [[ "$output" = /* ]]; then
+        a="$encrypt_dir"
+        IFS='/ ' read -r -a array <<< "$a"
+        currentFolder=""
+        for element in "${array[@]}"
+        do
+            currentFolder=$element
+        done
+        mkdir -p "$output/$currentFolder"
+        outdir="$output/$currentFolder"
+
+        cat restoreList.txt | while read toberestored
         do
             if [ -f "$toberestored" ]; then
                 echo $toberestored >> enc_restore.txt
             else
-                # some directory is not consider by ls
-                # need to create it by force
-                # issue if no sub directory on main dir
-                mkdir -p "$output/$toberestored"
+                #new folder for output
+                #folder is recursive
+                newoutputDir=`echo "$toberestored" | sed "s#$encrypt_dir##g"`
+                mkdir -p "$outdir$newoutputDir"
             fi
         done
+
+    else
+        echo 'no using remote dir'
+        cat restoreList.txt | while read toberestored
+            do
+                if [ -f "$toberestored" ]; then
+                    echo $toberestored >> enc_restore.txt
+                else
+                    # some directory is not consider by ls
+                    # need to create it by force
+                    # issue if no sub directory on main dir
+                    mkdir -p "$output/$toberestored"
+                fi
+            done
+    fi
+
 
     ls -lh "$output"
 
@@ -281,17 +302,35 @@ else
     sudo rm -rf restoreList.txt
 
     ## start mouting thes files
-    cat enc_restore.txt | while read filerestore; do
-        echo "MOUNTING: $filerestore"
-        sudo veracrypt -t -f --mount "$filerestore" --password=$password \
-        --non-interactive "$MOUNTPOINT" -v || exit 1
-        sudo cp "$MOUNTPOINT"/* "$output/$filerestore" -v
-        
-        echo 'UNMOUNTING...'
-        sudo veracrypt -t -f -d "$filerestore" -v || exit 1
-        sudo chmod 777 "$output/$filerestore"
-    done
+    cat enc_restore.txt
+    if [[ "$output" = /* ]]; then
+        cat enc_restore.txt | while read filerestore; do
+            echo "MOUNTING: $filerestore"
+            ls -lh "$filerestore"
+            copyTo=`echo "$filerestore" | sed "s#$encrypt_dir#$output/remote-dir#g"`
+            sudo veracrypt -t -f --mount "$filerestore" --password=$password \
+            --non-interactive "$MOUNTPOINT" -v || exit 1
+            sudo cp "$MOUNTPOINT"/* "$copyTo" -v
+            
+            echo 'UNMOUNTING...'
+            sudo veracrypt -t -f -d "$filerestore" -v || exit 1
+            echo '---------------------'
+        done
 
+    else
+        cat enc_restore.txt | while read filerestore; do
+            echo "MOUNTING: $filerestore"
+            sudo veracrypt -t -f --mount "$filerestore" --password=$password \
+            --non-interactive "$MOUNTPOINT" -v || exit 1
+            sudo cp "$MOUNTPOINT"/* "$output/$filerestore" -v
+            
+            echo 'UNMOUNTING...'
+            sudo veracrypt -t -f -d "$filerestore" -v || exit 1
+            echo '---------------------'
+        done
+    fi
+
+    sudo chmod 777 "$output" -R
     if [ -f enc_restore.txt ]; then
         sudo rm enc_restore.txt
     fi
