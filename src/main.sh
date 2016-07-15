@@ -131,6 +131,79 @@ createOutputDir(){
     fi
 }
 
+startEncrypt(){
+
+    COUNTER=0
+    TOTALFILES=`cat file.txt | wc -l`
+    echo 'TOTALFILES: ' $TOTALFILES
+    cat "file.txt"
+
+    a="$encrypt_dir"
+    IFS='/ ' read -r -a array <<< "$a"
+    currentFolder=""
+    for element in "${array[@]}"
+    do
+        currentFolder=$element
+    done
+
+    if [[ "$output" = /* ]]; then
+
+        cat file.txt | while read line; do
+            COUNTER=$((COUNTER+1))
+            P=`echo "$COUNTER*100/$TOTALFILES"|bc`
+            VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +2))"M"
+            echo "------------------------$P %----------------------------"
+            echo "filename: $line"
+            tobeEncrypt=`echo $line | sed "s#$encrypt_dir#$output/$currentFolder#g"`
+            echo "tobeEncrypt: $tobeEncrypt"
+            echo "CREATE VOLUME: $output/$line"
+            echo "VOLUME SIZE: " $VOLUMESIZE
+            sudo veracrypt -t -f -c "$tobeEncrypt" --size=$VOLUMESIZE \
+            --password=$password --hash="sha-512" --encryption="AES" \
+            --filesystem="NTFS" --non-interactive -v || exit 1
+
+            ##mount
+            echo 'MOUNTING...'
+            sudo veracrypt -t -f --mount "$tobeEncrypt" --password=$password \
+            --non-interactive "$MOUNTPOINT" -v || exit 1
+            sudo cp "$line" "$MOUNTPOINT/" || exit 1
+
+            ##unmount
+            echo 'UNMOUNTING...'
+            sudo veracrypt -t -f -d "$tobeEncrypt" -v || exit 1
+        done
+
+    else
+
+        cat file.txt | while read line; do
+            COUNTER=$((COUNTER+1))
+            P=`echo "$COUNTER*100/$TOTALFILES"|bc`
+            VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +2))"M"
+            echo "------------------------$P %----------------------------"
+            echo "CREATE VOLUME: $output/$line"
+            echo "VOLUME SIZE: " $VOLUMESIZE
+            sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
+            --password=$password --hash="sha-512" --encryption="AES" \
+            --filesystem="NTFS" --non-interactive -v || exit 1
+
+            ##mount
+            echo 'MOUNTING...'
+            sudo veracrypt -t -f --mount "$output/$line" --password=$password \
+            --non-interactive "$MOUNTPOINT" -v || exit 1
+            sudo cp "$line" "$MOUNTPOINT/" || exit 1
+
+            ##unmount
+            echo 'UNMOUNTING...'
+            sudo veracrypt -t -f -d "$output/$line" -v || exit 1
+        done
+
+    fi
+
+    sudo rm file.txt
+    sudo rm out.txt
+    sudo chmod 777 "$output" -R
+}
+
 MOUNTPOINT=/media/`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5`
 init1(){
     {
@@ -167,39 +240,10 @@ if [ "$enc_action" = "e" ]; then
     # out.txt will be replace if using abs path
     createOutputDir
     #cat out.txt
-    
 
-    COUNTER=0
-    TOTALFILES=`cat file.txt | wc -l`
-    echo 'TOTALFILES: ' $TOTALFILES
-    
+    #encrypting files
+    startEncrypt
 
-    cat "file.txt"
-    cat file.txt | while read line; do
-        COUNTER=$((COUNTER+1))
-        P=`echo "$COUNTER*100/$TOTALFILES"|bc`
-        VOLUMESIZE=$((`ls -s --block-size=1048576 "$line" | cut -d' ' -f1`  +2))"M"
-        echo "------------------------$P %----------------------------"
-        echo "CREATE VOLUME: $output/$line"
-        echo "VOLUME SIZE: " $VOLUMESIZE
-        # sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
-        #--password=$password --hash="sha-512" --encryption="AES" \
-        #--filesystem="NTFS" --non-interactive -v || exit 1
-
-        ##mount
-        echo 'MOUNTING...'
-        # sudo veracrypt -t -f --mount "$output/$line" --password=$password \
-        #--non-interactive "$MOUNTPOINT" -v || exit 1
-        sudo cp "$line" "$MOUNTPOINT/" || exit 1
-
-        ##unmount
-        echo 'UNMOUNTING...'
-        # sudo veracrypt -t -f -d "$output/$line" -v || exit 1
-    done
-
-    sudo rm file.txt
-    sudo rm out.txt
-    sudo chmod 777 "$output" -R
 else
 
     if [ -f enc_restore.txt ]; then
