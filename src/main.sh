@@ -242,11 +242,11 @@ echo "TO: $output"
 
 if [ "$enc_action" = "e" ]; then
     
-    sudo rm -rf $output
-    sudo mkdir $output
-
     #clean start files
     cleanup
+
+    sudo rm -rf $output
+    sudo mkdir $output
 
     ls -R "$encrypt_dir" | awk '
     /:$/&&f{s=$0;f=0}
@@ -314,7 +314,6 @@ else
     if [[ "$output" = /* ]]; then
         cat enc_restore.txt | while read filerestore; do
             echo "MOUNTING: $filerestore"
-            ls -lh "$filerestore"
             copyTo=`echo "$filerestore" | sed "s#$encrypt_dir#$output/$currentFolder#g"`
             sudo veracrypt -t -f --mount "$filerestore" --password=$password \
             --non-interactive "$MOUNTPOINT" -v || exit 1
@@ -339,9 +338,6 @@ else
     fi
 
     sudo chmod 777 "$output" -R
-    if [ -f enc_restore.txt ]; then
-        sudo rm enc_restore.txt
-    fi
 fi
 
 cleanup
