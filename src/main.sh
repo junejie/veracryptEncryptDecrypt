@@ -88,9 +88,7 @@ createOutputDir(){
         # restoreFrom = "/x/y/z" outputDir = "/a/b/c"
         # result = /a/b/c
         sudo cp out.txt "out-rm.txt"
-        #cat out.txt
         echo `pwd`
-        #cat out.txt
         cat out.txt | while read line
         do
             if [ -f "$line" ]; then
@@ -239,7 +237,6 @@ if [ "$enc_action" = "e" ]; then
     ### read list of dir and file
     # out.txt will be replace if using abs path
     createOutputDir
-    #cat out.txt
 
     #encrypting files
     startEncrypt
