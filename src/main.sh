@@ -134,7 +134,6 @@ startEncrypt(){
     COUNTER=0
     TOTALFILES=`cat file.txt | wc -l`
     echo 'TOTALFILES: ' $TOTALFILES
-    cat "file.txt"
 
     a="$encrypt_dir"
     IFS='/ ' read -r -a array <<< "$a"
@@ -210,10 +209,13 @@ init1(){
         sudo chmod 777 "$MOUNTPOINT" -R
         ls /media
         echo $MOUNTPOINT
-        sudo ls -lh $MOUNTPOINT
     } || {
         echo 1
     }
+}
+
+cleanup(){
+    sudo rm -rf $MOUNTPOINT
 }
 
 init1
@@ -333,6 +335,7 @@ else
     fi
 fi
 
+cleanup
 ### end proc ###
 shift $((OPTIND-1))
 
