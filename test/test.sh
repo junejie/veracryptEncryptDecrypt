@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -f out.txt ]; then
+  sudo rm "test-output.txt"
+fi
+
+sudo touch "test-output.txt"
 f_simpletest() {
 
   mkdir simpletest
@@ -139,6 +144,14 @@ f_dirremotedir() {
     rm -rf "/tmp/remote-dir"
   fi
 
+  if [ -d "/tmp/output" ]; then
+    rm -rf "/tmp/output"
+  fi
+
+  if [ -d "/tmp/remote-dir-x" ]; then
+    rm -rf "/tmp/remote-dir-x"
+  fi
+
   mkdir "/tmp/remote-dir"
   mkdir -p "/tmp/remote-dir/1"
   mkdir -p "/tmp/remote-dir/2/1"
@@ -155,8 +168,8 @@ f_dirremotedir() {
   echo "abc" > "/tmp/remote-dir/3/1/a.txt"
 
   ## start encrypt
-  sudo /bin/bash ../src/main.sh -v -p "/home/junejie/Documents/images/Viber Images 2016" -e -o "/home/junejie/Documents/images/Viber Images 2016-x" -a "abc123"
-  sudo /bin/bash ../src/main.sh -v -p "/home/junejie/Documents/images/Viber Images 2016-x" -d -o "/home/junejie/Documents/images/Viber Images 2016-y" -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p "/tmp/remote-dir" -e -o "/tmp/output" -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p "/tmp/output" -d -o "/tmp/remote-dir-x" -a "abc123"
 
   remotedir1=`{
     export LC_ALL=C;cd "/tmp/remote-dir";
@@ -176,35 +189,50 @@ f_dirremotedir() {
     echo "End of hashed data."; # End of input marker
   } | sha256sum`
 
-  rm -rf "/tmp/remote-dir"
+  if [ -d "/tmp/remote-dir" ]; then
+    sudo rm -rf "/tmp/remote-dir"
+  fi
+
+  if [ -d "/tmp/output" ]; then
+    sudo rm -rf "/tmp/output"
+  fi
+
+  if [ -d "/tmp/remote-dir-x" ]; then
+    sudo rm -rf "/tmp/remote-dir-x"
+  fi
 }
 
 runTest(){
+  if [ -f "test-output.txt" ]; then
+    sudo rm -rf "test-output.txt"
+  fi
 
   if [ "$r1" = "$r2" ]; then
-    echo 'ok: recursive'
+    echo 'ok: recursive' >> "test-output.txt"
   else
-    echo 'fail: recursive'
+    echo 'fail: recursive'  >> "test-output.txt"
   fi
 
   if [ "$test1" = "$test2" ]; then
-    echo 'ok: simpletest'
+    echo 'ok: simpletest' >> "test-output.txt"
   else
-    echo 'fail: simpletest'
+    echo 'fail: simpletest' >> "test-output.txt"
   fi
 
   if [ "$spacedir1" = "$spacedir2" ]; then
-    echo 'ok: spacedir'
+    echo 'ok: spacedir' >> "test-output.txt"
   else
-    echo 'fail: spacedir'
+    echo 'fail: spacedir' >> "test-output.txt"
   fi
 
   if [ "$remotedir1" = "$remotedir2" ]; then
-    echo 'ok: remotedir'
+    echo 'ok: remotedir' >> "test-output.txt"
   else
-    echo 'fail: remotedir'
+    echo 'fail: remotedir' >> "test-output.txt"
   fi
-
+  echo "--result--"
+  cat "test-output.txt"
+  echo "--result--"
 }
 
 f_simpletest
@@ -212,4 +240,3 @@ f_recursivetest
 f_dirwithspace
 f_dirremotedir
 runTest
-echo 'done'
