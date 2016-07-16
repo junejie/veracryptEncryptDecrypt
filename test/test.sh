@@ -10,8 +10,8 @@ f_simpletest() {
   touch 3.txt
   echo "3" > "simpletest/3.txt"
   
-  sudo /bin/bash src/main.sh -v -p simpletest -e -o output -a "abc123"
-  sudo /bin/bash src/main.sh -v -p output -d -o simpletestx -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p simpletest -e -o output -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p output -d -o simpletestx -a "abc123"
 
   test1=`{ 
   export LC_ALL=C;cd simpletest;
@@ -59,8 +59,8 @@ f_recursivetest() {
   echo "abc" > "recursive-dir/3/1/a.txt"
 
   ## start encrypt
-  sudo /bin/bash src/main.sh -v -p "recursive-dir" -e -o output -a "abc123"
-  sudo /bin/bash src/main.sh -v -p output -d -o "recursive-dir-x" -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p "recursive-dir" -e -o output -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p output -d -o "recursive-dir-x" -a "abc123"
 
   r1=`{
     export LC_ALL=C;cd "recursive-dir";
@@ -107,8 +107,8 @@ f_dirwithspace() {
   echo "abc" > "space dir/3/1/a.txt"
 
   ## start encrypt
-  sudo /bin/bash src/main.sh -v -p "space dir" -e -o output -a "abc123"
-  sudo /bin/bash src/main.sh -v -p output -d -o "space dir-x" -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p "space dir" -e -o output -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p output -d -o "space dir-x" -a "abc123"
 
   spacedir1=`{
     export LC_ALL=C;cd "space dir";
@@ -155,8 +155,8 @@ f_dirremotedir() {
   echo "abc" > "/tmp/remote-dir/3/1/a.txt"
 
   ## start encrypt
-  sudo /bin/bash src/main.sh -v -p "/tmp/remote-dir" -e -o "/tmp/output" -a "abc123"
-  sudo /bin/bash src/main.sh -v -p "/tmp/output" -d -o "/tmp/remote-dir-x" -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p "/home/junejie/Documents/images/Viber Images 2016" -e -o "/home/junejie/Documents/images/Viber Images 2016-x" -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p "/home/junejie/Documents/images/Viber Images 2016-x" -d -o "/home/junejie/Documents/images/Viber Images 2016-y" -a "abc123"
 
   remotedir1=`{
     export LC_ALL=C;cd "/tmp/remote-dir";
