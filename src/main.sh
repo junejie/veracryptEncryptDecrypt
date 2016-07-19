@@ -65,7 +65,7 @@ done
 
 ### start process ###
 getCurrentFolder(){
-    IFS='/ ' read -r -a array <<< "$1"
+    IFS='/' read -r -a array <<< "$1"
     currentFolder=""
     for element in "${array[@]}"
     do
