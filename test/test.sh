@@ -202,6 +202,73 @@ f_dirremotedir() {
   fi
 }
 
+
+f_dirremotespacedir() {
+  echo '---- next test -----'
+  ## build test for recursive dir
+  if [ -d "/tmp/remote dir" ]; then
+    rm -rf "/tmp/remote dir"
+  fi
+
+  if [ -d "/tmp/output 1" ]; then
+    rm -rf "/tmp/output 1"
+  fi
+
+  if [ -d "/tmp/remote dir-x" ]; then
+    rm -rf "/tmp/remote dir-x"
+  fi
+
+  mkdir "/tmp/remote dir"
+  mkdir -p "/tmp/remote dir/1"
+  mkdir -p "/tmp/remote dir/2/1"
+  mkdir -p "/tmp/remote dir/3/1"
+
+  ## create file for recursive dir
+  touch "/tmp/remote dir/1/a.txt"
+  echo "abc" > "/tmp/remote dir/1/a.txt"
+
+  touch "/tmp/remote dir/2/1/a.txt"
+  echo "abc" > "/tmp/remote dir/2/1/a.txt"
+
+  touch "/tmp/remote dir/3/1/a.txt"
+  echo "abc" > "/tmp/remote dir/3/1/a.txt"
+
+  ## start encrypt
+  sudo /bin/bash ../src/main.sh -v -p "/tmp/remote dir" -e -o "/tmp/output 1" -a "abc123"
+  sudo /bin/bash ../src/main.sh -v -p "/tmp/output 1" -d -o "/tmp/remote dir-x" -a "abc123"
+
+  remotedirspace1=`{
+    export LC_ALL=C;cd "/tmp/remote dir";
+    du -0ab | sort -z; # file lengths, including directories (with length 0)
+    echo | tr '\n' '\000'; # separator
+    find -type f -exec sha256sum {} + | sort -z; # file hashes
+    echo | tr '\n' '\000'; # separator
+    echo "End of hashed data."; # End of input marker
+  } | sha256sum`
+
+  remotedirspace2=`{
+    export LC_ALL=C;cd "/tmp/remote dir-x/output 1/remote dir";
+    du -0ab | sort -z; # file lengths, including directories (with length 0)
+    echo | tr '\n' '\000'; # separator
+    find -type f -exec sha256sum {} + | sort -z; # file hashes
+    echo | tr '\n' '\000'; # separator
+    echo "End of hashed data."; # End of input marker
+  } | sha256sum`
+
+
+  if [ -d "/tmp/remote dir" ]; then
+    sudo rm -rf "/tmp/remote dir"
+  fi
+
+  if [ -d "/tmp/output 1" ]; then
+    sudo rm -rf "/tmp/output 1"
+  fi
+
+  if [ -d "/tmp/remote dir-x" ]; then
+    sudo rm -rf "/tmp/remote dir-x"
+  fi
+}
+
 runTest(){
   if [ -f "test-output.txt" ]; then
     sudo rm -rf "test-output.txt"
@@ -230,13 +297,21 @@ runTest(){
   else
     echo 'fail: remotedir' >> "test-output.txt"
   fi
+
+  if [ "$remotedirspace1" = "$remotedirspace2" ]; then
+    echo 'ok: remotedirspace' >> "test-output.txt"
+  else
+    echo 'fail: remotedirspace' >> "test-output.txt"
+  fi
+  
   echo "--result--"
   cat "test-output.txt"
   echo "--result--"
 }
 
-f_simpletest
-f_recursivetest
-f_dirwithspace
-f_dirremotedir
+# f_simpletest
+# f_recursivetest
+# f_dirwithspace
+# f_dirremotedir
+f_dirremotespacedir
 runTest

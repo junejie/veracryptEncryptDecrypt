@@ -149,6 +149,7 @@ startEncrypt(){
 
             ##mount
             echo 'MOUNTING...'
+            # sudo umount `mount | grep veracrypt | awk '{print $3}'`
             sudo veracrypt -t -f --mount "$tobeEncrypt" --password=$password \
             --non-interactive "$MOUNTPOINT" -v || exit 1
             sudo cp "$line" "$MOUNTPOINT/" || exit 1
@@ -237,8 +238,8 @@ echo "TO: $output"
 
 if [ "$enc_action" = "e" ]; then
 
-    sudo rm -rf $output
-    sudo mkdir $output
+    sudo rm -rf "$output"
+    sudo mkdir "$output"
 
     if [ -f file.txt ]; then
         sudo rm file.txt
