@@ -309,9 +309,9 @@ runTest(){
   echo "--result--"
 }
 
-# f_simpletest
-# f_recursivetest
-# f_dirwithspace
-# f_dirremotedir
+f_simpletest
+f_recursivetest
+f_dirwithspace
+f_dirremotedir
 f_dirremotespacedir
 runTest
