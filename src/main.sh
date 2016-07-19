@@ -193,7 +193,7 @@ getCurrentFolder "$encrypt_dir"
 MOUNTPOINT=/media/`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5`
 init1(){
     {
-        sudo veracrypt -t -dv  >> $logfile
+        sudo veracrypt -t -d >> $logfile
         sudo mkdir -p "$MOUNTPOINT"
         sudo chmod 777 "$MOUNTPOINT" -R
         echo $MOUNTPOINT >> $logfile
@@ -331,6 +331,7 @@ else
     fi
 
     sudo chmod 777 "$output" -R
+
 fi
 
 cleanup

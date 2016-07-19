@@ -6,7 +6,7 @@ fi
 
 sudo touch "test-output.txt"
 f_simpletest() {
-
+  echo '----test:f_simpletest-----'
   mkdir simpletest
   touch 1.txt
   echo "1" > "simpletest/1.txt"
@@ -42,7 +42,7 @@ f_simpletest() {
 }
 
 f_recursivetest() {
-  echo '---- next test -----'
+  echo '----test:f_recursivetest-----'
   ## build test for recursive dir
   if [ -d "recursive-dir" ]; then
     rm -rf "recursive-dir"
@@ -90,7 +90,7 @@ f_recursivetest() {
 }
 
 f_dirwithspace() {
-  echo '---- next test -----'
+  echo '----test:f_dirwithspace-----'
   ## build test for recursive dir
   if [ -d "space dir" ]; then
     rm -rf "space dir"
@@ -138,7 +138,7 @@ f_dirwithspace() {
 
 
 f_dirremotedir() {
-  echo '---- next test -----'
+  echo '----test:f_dirremotedir-----'
   ## build test for recursive dir
   if [ -d "/tmp/remote-dir" ]; then
     rm -rf "/tmp/remote-dir"
@@ -204,7 +204,7 @@ f_dirremotedir() {
 
 
 f_dirremotespacedir() {
-  echo '---- next test -----'
+  echo '----test:f_dirremotespacedir-----'
   ## build test for recursive dir
   if [ -d "/tmp/remote dir" ]; then
     rm -rf "/tmp/remote dir"
