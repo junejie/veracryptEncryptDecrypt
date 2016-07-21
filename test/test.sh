@@ -339,7 +339,7 @@ runTest(){
     echo 'fail: remotedirspace' >> "test-output.txt"
   fi
 
-  if [ $file_and_dir_count -eq 3 ]; then
+  if [ $file_and_dir_count -eq 4 ]; then
     echo 'ok: less_dirfingerPrint' >> "test-output.txt"
   else
     echo 'fail: less_dirfingerPrint' >> "test-output.txt"
