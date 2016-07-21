@@ -299,6 +299,11 @@ f_dirremotespacedir() {
   fi
 }
 
+less_dirfingerPrint(){
+  file_and_dir_count=`ls -lh |wc -l`
+
+}
+
 runTest(){
   if [ -f "test-output.txt" ]; then
     sudo rm -rf "test-output.txt"
@@ -333,6 +338,12 @@ runTest(){
   else
     echo 'fail: remotedirspace' >> "test-output.txt"
   fi
+
+  if [ $file_and_dir_count -eq 3 ]; then
+    echo 'ok: less_dirfingerPrint' >> "test-output.txt"
+  else
+    echo 'fail: less_dirfingerPrint' >> "test-output.txt"
+  fi
   
   echo "--result--"
   cat "test-output.txt"
@@ -344,4 +355,5 @@ f_recursivetest
 f_dirwithspace
 f_dirremotedir
 f_dirremotespacedir
+less_dirfingerPrint
 runTest
