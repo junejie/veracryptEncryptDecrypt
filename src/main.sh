@@ -67,14 +67,28 @@ isError=0
 if [ -z "$encrypt_dir" ]; then
     echo '+------------------error------------------+'
     echo '| -p not set. ex: -p "/tmp/foldername"    |'
-    echo '+-----------------------------------------+'
+    echo "+-----------------------------------------+\n"
     isError=1
 fi
 
 if [ -z "$output" ]; then
     echo '+------------------error------------------+'
-    echo '| -p not set. ex: -o "/tmp/output"        |'
-    echo '+-----------------------------------------+'
+    echo '| -o not set. ex: -o "/tmp/output"        |'
+    echo "+-----------------------------------------+\n"
+    isError=1
+fi
+
+if [ -z "$enc_action" ]; then
+    echo '+------------------error------------------+'
+    echo '| [-e|-d] not set. ex: -e or -d           |'
+    echo "+-----------------------------------------+\n"
+    isError=1
+fi
+
+if [ -z "$password" ]; then
+    echo '+------------------error------------------+'
+    echo '| -a not set. ex: -a "password"           |'
+    echo "+-----------------------------------------+\n"
     isError=1
 fi
 
