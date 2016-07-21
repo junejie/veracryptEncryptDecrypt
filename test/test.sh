@@ -8,11 +8,11 @@ sudo touch "test-output.txt"
 f_simpletest() {
   echo '----test:f_simpletest-----'
   mkdir simpletest
-  touch 1.txt
+  touch simpletest/1.txt
   echo "1" > "simpletest/1.txt"
-  touch 2.txt
+  touch simpletest/2.txt
   echo "2" > "simpletest/2.txt"
-  touch 3.txt
+  touch simpletest/3.txt
   echo "3" > "simpletest/3.txt"
   
   sudo /bin/bash ../src/main.sh -v -p simpletest -e -o output -a "abc123"
