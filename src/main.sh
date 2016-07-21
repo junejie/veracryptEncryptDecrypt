@@ -61,8 +61,28 @@ while getopts "h?vedp:a:o:" opts; do
         ;;
     esac
 done
-
 echo '----start logfile----' >> $logfile
+# validate variables
+if [ -z "$encrypt_dir" ]; then
+    echo '+------------------error------------------+'
+    echo '| -p not set. ex: -p "/tmp/foldername"    |'
+    echo '+-----------------------------------------+'
+    exit 1
+fi
+
+MOUNTPOINT=/media/`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5`
+
+init1(){
+    # check mount point
+    {
+        sudo veracrypt -t -d >> $logfile
+        sudo mkdir -p "$MOUNTPOINT"
+        sudo chmod 777 "$MOUNTPOINT" -R
+        echo $MOUNTPOINT >> $logfile
+    } || {
+        echo "Error mounting"  >> $logfile
+    }
+}
 
 getCurrentFolder(){
     IFS='/' read -r -a array <<< "$1"
@@ -188,20 +208,6 @@ startEncrypt(){
     sudo chmod 777 "$output" -R
 }
 
-# initialized
-getCurrentFolder "$encrypt_dir"
-MOUNTPOINT=/media/`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5`
-init1(){
-    {
-        sudo veracrypt -t -d >> $logfile
-        sudo mkdir -p "$MOUNTPOINT"
-        sudo chmod 777 "$MOUNTPOINT" -R
-        echo $MOUNTPOINT >> $logfile
-    } || {
-        echo "Error mounting"  >> $logfile
-    }
-}
-
 cleanup(){
     sudo rm -rf $MOUNTPOINT
 
@@ -230,7 +236,9 @@ cleanup(){
     fi
 }
 
+# initialized
 init1
+getCurrentFolder "$encrypt_dir"
 
 echo "FROM: $encrypt_dir" >> $logfile
 echo "TO: $output" >> $logfile
