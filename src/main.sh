@@ -63,10 +63,22 @@ while getopts "h?vedp:a:o:" opts; do
 done
 echo '----start logfile----' >> $logfile
 # validate variables
+isError=0
 if [ -z "$encrypt_dir" ]; then
     echo '+------------------error------------------+'
     echo '| -p not set. ex: -p "/tmp/foldername"    |'
     echo '+-----------------------------------------+'
+    isError=1
+fi
+
+if [ -z "$output" ]; then
+    echo '+------------------error------------------+'
+    echo '| -p not set. ex: -o "/tmp/output"        |'
+    echo '+-----------------------------------------+'
+    isError=1
+fi
+
+if [ $isError -eq 1 ]; then
     exit 1
 fi
 
