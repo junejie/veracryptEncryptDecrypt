@@ -1,3 +1,9 @@
+Requirements
+===========
+    
+    docker
+    veracrypt
+
 execute
 =======
 
