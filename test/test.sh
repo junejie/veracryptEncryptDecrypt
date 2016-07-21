@@ -35,9 +35,18 @@ f_simpletest() {
   echo | tr '\n' '\000'; # separator
   echo "End of hashed data."; # End of input marker
   } | sha256sum`
-  rm simpletest -rf
-  rm simpletestx -rf
-  rm output -rf
+
+  if [ -d "simpletest" ]; then
+    sudo rm -rf "simpletest"
+  fi
+
+  if [ -d "simpletestx" ]; then
+    sudo rm -rf "simpletestx"
+  fi
+
+  if [ -d "output" ]; then
+    sudo rm -rf "output"
+  fi
 
 }
 
@@ -85,7 +94,17 @@ f_recursivetest() {
     echo "End of hashed data."; # End of input marker
   } | sha256sum`
 
-  rm -rf "recursive-dir"
+  if [ -d "recursive-dir" ]; then
+    sudo rm -rf "recursive-dir"
+  fi
+
+  if [ -d "output" ]; then
+    sudo rm -rf "output"
+  fi
+
+  if [ -d "recursive-dir-x" ]; then
+    sudo rm -rf "recursive-dir-x"
+  fi
 
 }
 
@@ -133,7 +152,18 @@ f_dirwithspace() {
     echo "End of hashed data."; # End of input marker
   } | sha256sum`
 
-  rm -rf "space dir"
+  if [ -d "space dir" ]; then
+    sudo rm -rf "space dir"
+  fi
+
+  if [ -d "space dir-x" ]; then
+    sudo rm -rf "space dir-x"
+  fi
+
+  if [ -d "output" ]; then
+    sudo rm -rf "output"
+  fi
+  
 }
 
 
