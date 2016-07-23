@@ -6,12 +6,12 @@ docker pull junejie/veracrypt:latest
 j_pwd=`pwd`
 #cd test ; j_pwd=`pwd`;cd ../
 {
-    docker run --name test-vera -d -v $j_pwd:/data -it ub-veracrypt
+    docker run --name test-vera -d -v $j_pwd:/data -it junejie/veracrypt
 } || {
     echo 'failed to run'
     docker stop test-vera
     docker rm test-vera
-    docker run --name test-vera -d -v $j_pwd:/data -it ub-veracrypt
+    docker run --name test-vera -d -v $j_pwd:/data -it junejie/veracrypt
 }
 docker ps
 {
