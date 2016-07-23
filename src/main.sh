@@ -191,7 +191,7 @@ startEncrypt(){
             echo "VOLUME SIZE: " $VOLUMESIZE >> $logfile
             sudo veracrypt -t -f -c "$tobeEncrypt" --size=$VOLUMESIZE \
             --password=$password --hash="sha-512" --encryption="AES" \
-            --filesystem="NTFS" --non-interactive >> $logfile || exit 1  >> $logfile
+            --filesystem="FAT" --non-interactive >> $logfile || exit 1  >> $logfile
 
             ##mount
             echo 'MOUNTING...'  >> $logfile
@@ -216,7 +216,7 @@ startEncrypt(){
             echo "VOLUME SIZE: " $VOLUMESIZE >> $logfile
             sudo veracrypt -t -f -c "$output/$line" --size=$VOLUMESIZE \
             --password=$password --hash="sha-512" --encryption="AES" \
-            --filesystem="NTFS" --non-interactive >> $logfile || exit 1 >> $logfile
+            --filesystem="FAT" --non-interactive >> $logfile || exit 1 >> $logfile
 
             ##mount
             echo 'MOUNTING...' >> $logfile
