@@ -1,5 +1,7 @@
 #!/bin/bash
-
+echo '-------------------------'
+echo 'pwd:' `pwd`
+echo '-------------------------'
 if [ -f out.txt ]; then
   sudo rm "test-output.txt"
 fi
