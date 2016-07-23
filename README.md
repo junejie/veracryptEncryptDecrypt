@@ -1,3 +1,26 @@
+Requirements
+===========
+    
+    docker
+    veracrypt
+
+update docker
+=============
+
+    1. pull the junejie/veracrypt docker
+    2. run it
+
+        docker run -it junejie/veracrypt
+
+    3. do the update
+    4. do the docker commit
+
+        docker commit hash junejie/veracrypt
+
+    5. do push
+
+        docker push 
+
 execute
 =======
 
