@@ -4,6 +4,18 @@ Requirements
     docker
     veracrypt
 
+Veracrypt Docker
+================
+
+    installed apps are:
+
+        1. veracrypt
+        2. bc
+        3. dmsetup
+        4. unzip
+        5. libfuse-dev
+        6. libfuse2 
+
 update docker
 =============
 
